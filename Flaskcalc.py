@@ -27,10 +27,8 @@ def upload_file():
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            
             # Spara filen temporärt
             file.save(file_path)
-            
             # Kontrollera MIME-typen
             file_mime_type = magic.from_file(file_path, mime=True)
             if file_mime_type == 'application/pdf':
@@ -38,9 +36,11 @@ def upload_file():
                     text = extract_text_from_pdf(file_path)
                     name, courses_list = clean_text(text)
                     gpa = calculate_gpa(courses_list)
+                    # Choose background image based on GPA
+                    background_image = choose_background_image(gpa)
                     # Radera filen efter att vi är klara
                     os.remove(file_path)
-                    return render_template('gpa_result.html', name=name, courses=courses_list, gpa=gpa)
+                    return render_template('gpa_result.html', name=name, courses=courses_list, gpa=gpa, background_image=background_image)
                 except Exception as e:
                     os.remove(file_path)  # Se till att radera filen även vid fel
                     return str(e)
@@ -63,6 +63,24 @@ def extract_text_from_pdf(pdf_path):
         for page in reader.pages:
             text += page.extract_text() + "\n"
     return text
+
+def choose_background_image(gpa):
+    if gpa >= 5:
+        return 'gpa5.jpg'
+    elif gpa >= 4.5:
+        return 'gpa4.5.jpg'
+    elif gpa >= 4.25:
+        return 'gpa4.25.jpg'
+    elif gpa >= 4:
+        return 'gpa4.jpg'
+    elif gpa >= 3.75:
+        return 'gpa3.75.jpg'
+    elif gpa >= 3.5:
+        return 'gpa3.5.jpg'
+    elif gpa > 3.0:
+        return 'gpa3+.jpg'
+    else:
+        return 'gpa3.jpg'
 
 # Funktion för att rensa texten och returnera en lista av kurser
 def clean_text(text):
