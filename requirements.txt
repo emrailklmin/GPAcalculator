@@ -1,4 +1,4 @@
 Flask==3.0.0
-PyPDF2==1.26.0  # Use the latest version or the one you've tested with
-python-magic==0.4.24  # Use the latest version or the one you've tested with
-Werkzeug==2.2.2  # Use the latest version or the one you've tested with
+PyPDF2==3.0.1
+python-magic==0.4.27
+Werkzeug==3.0.1
