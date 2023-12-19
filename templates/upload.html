@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ladda upp för GPA beräkning</title>
+<!-- Include Bootstrap CSS -->
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+
+<!-- Page content -->
+<div class="container mt-5">
+    <!-- Title -->
+    <h1 class="text-center mb-4">Ladda upp ditt resultatintyg för att beräkna GPA</h1>
+    
+    <!-- Upload form -->
+    <form action="{{ url_for('upload_file') }}" method="post" enctype="multipart/form-data" class="text-center">
+        <div class="custom-file mb-3">
+            <input type="file" class="custom-file-input" id="customFile" name="file">
+            <label class="custom-file-label" for="customFile">Välj fil</label>
+        </div>
+        <button type="submit" class="btn btn-primary">Ladda upp</button>
+    </form>
+    
+    <!-- Images with descriptions -->
+    <div class="mt-4">
+        <!-- Image 1 with description -->
+        <div class="text-center">
+            <p class="mt-2">1. För att hämta ditt resultatintyg, <a href="https://www.student.ladok.se/student/app/studentwebb/intyg" target="_blank">logga in på Ladok</a> och tryck på skapa intyg.</p>
+            <img src="{{ url_for('static', filename='image1.jpg') }}" alt="Guide Step 1" class="img-fluid">
+        </div>
+        
+        <!-- Image 2 with description -->
+        <div class="text-center">
+            <p class="mt-2">2   Välj resultatintyg och tryck sedan på skapa. 3   ladda ner resultatet till din dator</p>
+            <img src="{{ url_for('static', filename='image2.jpg') }}" alt="Guide Step 2" class="img-fluid">
+        </div>
+    </div>
+</div>
+
+<!-- Include Bootstrap JS, Popper.js, and jQuery -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.7.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<!-- Script to update the label of custom file input with the name of the selected file -->
+<script>
+$(document).ready(function () {
+  $('.custom-file-input').on('change', function() {
+    let fileName = $(this).val().split('\\').pop();
+    $(this).next('.custom-file-label').addClass("selected").html(fileName);
+  });
+});
+</script>
+
+</body>
+</html>
