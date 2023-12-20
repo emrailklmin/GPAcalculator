@@ -29,13 +29,17 @@
             z-index: 2;
             padding: 1em;
         }
+        .hidden {
+            display: none;
+        }
     </style>
 </head>
 <body>
     <div class="overlay">
         <div class="content">
             <div class="container mt-5">
-                <h1 class="text-center mb-4">GPA Resultat för {{ name }}</h1>
+                <h1 class="text-center mb-4" id="user-name">GPA Resultat för {{ name }}</h1>
+                <h2 class="text-center">Viktat GPA: {{ gpa }}</h2>
                 <table class="table table-striped">
                     <thead>
                         <tr>
@@ -50,23 +54,73 @@
                         <tr>
                             <td>{{ course[0] }}</td>
                             <td>{{ course[1] }}</td>
-                            <td>{{ course[2] }}</td>
+                            <td>
+                                <span class="grade-text">{{ course[2] }}</span>
+                                <input type="text" class="grade-input hidden" value="{{ course[2] }}" />
+                            </td>
                             <td>{{ course[3] }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
-                <div class="text-center">
-                    <h2>Ditt genomsnittliga GPA är: {{ gpa }}</h2>
-                    <a href="{{ url_for('index') }}" class="btn btn-primary mt-3">Ladda upp ny PDF</a>
-                </div>
+                <button id="toggle-edit" class="btn btn-warning">Ändra Betyg</button>
+                <a href="/" class="btn btn-secondary">Ladda upp ny fil</a>
+                <button id="recalculate-gpa" class="btn btn-primary hidden">Räkna om GPA</button>
             </div>
         </div>
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.7.2/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        var editing = false; // State to track whether we're in editing mode
 
+        document.getElementById('toggle-edit').addEventListener('click', function() {
+            var gradeInputs = document.querySelectorAll('.grade-input');
+            var gradeTexts = document.querySelectorAll('.grade-text');
+            var userName = document.getElementById('user-name');
+            var recalculateButton = document.getElementById('recalculate-gpa');
+            var toggleButton = document.getElementById('toggle-edit');
+
+            gradeInputs.forEach(function(input) {
+                input.classList.toggle('hidden');
+            });
+            gradeTexts.forEach(function(text) {
+                text.classList.toggle('hidden');
+            });
+
+            if (editing) {
+                // Switch back to original GPA display
+                toggleButton.textContent = 'Ändra Betyg';
+                userName.classList.remove('hidden');
+                recalculateButton.classList.add('hidden');
+                document.querySelector('h2.text-center').textContent = 'Viktat GPA: {{ gpa }}'; // Reset to original GPA
+            } else {
+                // Switch to editable GPA mode
+                toggleButton.textContent = 'Tillbaka till mitt GPA';
+                userName.classList.add('hidden');
+                recalculateButton.classList.remove('hidden');
+            }
+
+            editing = !editing; // Toggle the editing state
+        });
+
+        document.getElementById('recalculate-gpa').addEventListener('click', function() {
+            var gradePoints = {'A': 5, 'B': 4.5, 'C': 4, 'D': 3.5, 'E': 3};
+            var grades = document.querySelectorAll('.grade-input');
+            var totalPoints = 0, totalCredits = 0;
+
+            grades.forEach(function(gradeInput) {
+                var grade = gradeInput.value.toUpperCase();
+                var credits = parseFloat(gradeInput.closest('tr').children[1].textContent.replace('hp', '').replace(',', '.'));
+
+                var points = (gradePoints[grade] || 0) * credits;
+                totalPoints += points;
+                totalCredits += credits;
+            });
+
+            var newGPA = totalCredits > 0 ? (totalPoints / totalCredits).toFixed(2) : 0;
+            document.querySelector('h2.text-center').textContent = 'Viktat GPA: ' + newGPA;
+        });
+    </script>
+    
 </body>
 </html>
